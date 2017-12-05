@@ -1,6 +1,6 @@
 class Decryptor:
-    def analyze_cipher(self):
+    
+    def analyze_cipher(self, words):
         pass
     
-    def decrypt(self):
-        pass
+
