@@ -5,7 +5,11 @@ class MasksBuilder:
     def build_masks(words):
         masks = dict()
         for word in words:
-            masks[word] = MasksBuilder.build_mask(word)
+            mask = MasksBuilder.build_mask(word)
+            if mask not in masks:
+                masks[mask] = [word]
+            else:
+                masks[mask].append(word)
         return masks
     
     @staticmethod

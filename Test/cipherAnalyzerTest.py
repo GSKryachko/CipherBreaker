@@ -12,7 +12,11 @@ class CipherAnalyzerTest(unittest.TestCase):
                           'e': ['p']
                           }
         analyzer.assumed_cipher = assumed_cipher
-        expected = assumed_cipher
+        expected = {'a': 'e',
+                    'p': 'a',
+                    'l': 'l',
+                    'e': 'p'
+                    }
         actual = analyzer.try_get_cipher()
         self.assertEqual(expected, actual)
     
@@ -74,3 +78,6 @@ class CipherAnalyzerTest(unittest.TestCase):
         expected = ['i', 'have', 'a', 'an', 'pen', 'apple']
         actual = CipherAnalyzer.prepare_words(text)
         self.assertSetEqual(set(actual), set(expected))
+    
+    def test_range_mask(self):
+        self.assertEqual(5, CipherAnalyzer.range_mask('bonobo'))

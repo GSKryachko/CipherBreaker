@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 
 from masksBuilder import MasksBuilder
 
@@ -7,6 +8,8 @@ class CipherAnalyzer:
     def __init__(self, words_with_masks):
         self.words_with_masks = words_with_masks
         self.assumed_cipher = dict()
+        self.cipher = dict()
+        self.ranged_masks = dict()
     
     def analyze_cipher(self, words):
         for word in words:
@@ -15,26 +18,59 @@ class CipherAnalyzer:
                 self.register_chars(self.words_with_masks[mask], word)
         return self.try_get_cipher()
     
+    def analyze_cipher_using_range(self, words):
+        ranged_words = self.range_words(words)
+        for count in sorted(ranged_words, reverse=True):
+            for word in ranged_words[count]:
+                mask = MasksBuilder.build_mask(word)
+                if mask in self.words_with_masks:
+                    self.register_chars(self.words_with_masks[mask], word)
+                    self.try_get_cipher()
+        return self.cipher
+    
+    def range_masks(self):
+        for mask in self.words_with_masks:
+            mask_frequency_index = CipherAnalyzer.range_mask(mask)
+            if mask_frequency_index not in self.ranged_masks:
+                self.ranged_masks[mask_frequency_index] = set()
+            self.ranged_masks[mask_frequency_index].add(mask)
+    
+    @staticmethod
+    def range_mask(mask):
+        counter = Counter(mask)
+        return sum([x for x in counter.values() if x > 1])
+    
+    def range_words(self, words):
+        words_with_mask = dict()
+        for word in words:
+            mask_frequency_index = CipherAnalyzer.range_mask(word)
+            if mask_frequency_index not in words_with_mask:
+                words_with_mask[mask_frequency_index] = set()
+            words_with_mask[mask_frequency_index].add(word)
+        return words_with_mask
+    
     def register_chars(self, words, encrypted_word):
         for word in words:
             for i in range(len(word)):
+                if encrypted_word[i] in self.cipher:
+                    continue
                 if encrypted_word[i] not in self.assumed_cipher:
-                    self.assumed_cipher[encrypted_word[i]] = [word[i]]
-                else:
-                    self.assumed_cipher[encrypted_word[i]].append(word[i])
+                    self.assumed_cipher[encrypted_word[i]] = set()
+                self.assumed_cipher[encrypted_word[i]].add(word[i])
     
     def try_get_cipher(self):
-        cipher = dict()
         for i in self.assumed_cipher:
+            if i in self.cipher:
+                continue
             if len(self.assumed_cipher[i]) == 1:
-                cipher[i] = self.assumed_cipher[i][0]
-            else:
-                return None
-        return cipher
+                self.cipher[i] = next(iter(self.assumed_cipher[i]))
+        self.assumed_cipher.clear()
     
     @staticmethod
     def prepare_words(text):
         words = set()
-        for word in re.sub('[!@#$.,\'?:;]', '', text).split(' '):
-            words.add(word.lower())
+        for word in re.sub('[!@#$.,\'?:;-`\"]', '', text).replace('\n', ' ') \
+                .split(' '):
+            if word != '':
+                words.add(word.lower())
         return list(words)
