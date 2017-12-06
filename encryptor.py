@@ -1,13 +1,9 @@
-
 class Encryptor:
-    def __init__(self, alphabet):
-        self.cipher = None
+    def __init__(self, cipher, alphabet):
+        self.cipher = cipher
         self.alphabet = alphabet
-      
+    
     def encrypt(self, text):
-        if self.cipher is None:
-            print("Cipher not registered")
-            return
         return self.replace(text)
     
     def replace(self, text):
