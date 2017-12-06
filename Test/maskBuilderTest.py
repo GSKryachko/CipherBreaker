@@ -26,3 +26,9 @@ class MaskBuilderTest(unittest.TestCase):
                     'abcde': ['peach', 'table']}
         actual = MasksBuilder.build_masks(words)
         self.assertEqual(expected, actual)
+    
+    def test_prepare_text(self):
+        text = "Probably, it wasn't a good idea?"
+        expected = ['probably', 'it', 'wasnt', 'a', 'good', 'idea']
+        actual = MasksBuilder.prepare_words(text)
+        self.assertEqual(expected, actual)

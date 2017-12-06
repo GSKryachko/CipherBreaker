@@ -11,13 +11,6 @@ class CipherAnalyzer:
         self.cipher = dict()
         self.ranged_masks = dict()
     
-    def analyze_cipher(self, words):
-        for word in words:
-            mask = MasksBuilder.build_mask(word)
-            if mask in self.words_with_masks:
-                self.register_chars(self.words_with_masks[mask], word)
-        return self.try_get_cipher()
-    
     def analyze_cipher_using_range(self, words):
         ranged_words = self.range_words(words)
         for count in sorted(ranged_words, reverse=True):
@@ -69,8 +62,7 @@ class CipherAnalyzer:
     @staticmethod
     def prepare_words(text):
         words = set()
-        for word in re.sub('[!@#$.,\'?:;-`\"]', '', text).replace('\n', ' ') \
-                .split(' '):
+        for word in re.sub('[!@#$.,\'?:;`\"]', '', text).replace('\n', ' ').split(' '):
             if word != '':
                 words.add(word.lower())
         return list(words)

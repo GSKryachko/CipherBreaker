@@ -14,7 +14,7 @@ class MaskBuilderTest(unittest.TestCase):
                   }
         encryptor = Encryptor(cipher, alphabet)
         expected = "eaalp"
-        actual = encryptor.encrypt(word)
+        actual = encryptor.replace(word)
         self.assertEqual(expected, actual)
     
     def test_ignore_unknown_chars(self):
@@ -27,5 +27,18 @@ class MaskBuilderTest(unittest.TestCase):
                   }
         encryptor = Encryptor(cipher, alphabet)
         expected = "eaalps"
-        actual = encryptor.encrypt(word)
+        actual = encryptor.replace(word)
+        self.assertEqual(expected, actual)
+
+    def test_save_cases(self):
+        word = "Apple"
+        alphabet = "aple"
+        cipher = {'a': 'e',
+                  'p': 'a',
+                  'l': 'l',
+                  'e': 'p'
+                  }
+        encryptor = Encryptor(cipher, alphabet)
+        expected = "Eaalp"
+        actual = encryptor.replace(word)
         self.assertEqual(expected, actual)

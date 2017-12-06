@@ -1,3 +1,6 @@
+import re
+
+
 class MasksBuilder:
     alphabet = "abcdefghijklmnopqrstuvwxyz"
     
@@ -23,3 +26,8 @@ class MasksBuilder:
                 pointer += 1
             mask += substitution[i]
         return mask
+
+    @staticmethod
+    def prepare_words(text):
+        return [word.lower() for word in
+                re.sub('[!@#$.,\'?:;`-]', '', text).split(' ')]
