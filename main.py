@@ -27,7 +27,6 @@ get_key_parser.add_argument('key')
 args = parser.parse_args()
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
-print(args.goal)
 if args.goal == 'encrypt':
     key = CipherGenerator.generate_cipher(alphabet)
     Controller.encrypt(args.source, args.destination, key)

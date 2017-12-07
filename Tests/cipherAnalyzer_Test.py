@@ -71,4 +71,4 @@ class CipherAnalyzerTest(unittest.TestCase):
         self.assertSetEqual(set(actual), set(expected))
     
     def test_range_mask(self):
-        self.assertEqual(5, CipherAnalyzer.range_mask('bonobo'))
+        self.assertEqual(14, CipherAnalyzer.range_mask('bonobo'))

@@ -31,7 +31,7 @@ class CipherAnalyzer:
     @staticmethod
     def range_mask(mask):
         counter = Counter(mask)
-        return sum([x for x in counter.values() if x > 1])
+        return sum([x ** 2 for x in counter.values()])
     
     def range_words(self, words):
         words_with_mask = dict()
@@ -62,7 +62,8 @@ class CipherAnalyzer:
     @staticmethod
     def prepare_words(text):
         words = set()
-        for word in re.sub('[!@#$.,\'?:;`\"]', '', text).replace('\n', ' ').split(' '):
+        for word in re.sub('[!@#$.,\'?:;`\"()[\]{}\-%*1-9]', '', text).replace(
+                '\n', ' ').split(' '):
             if word != '':
                 words.add(word.lower())
         return list(words)
