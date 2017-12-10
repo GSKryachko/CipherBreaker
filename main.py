@@ -24,6 +24,10 @@ get_key_parser.add_argument('text')
 get_key_parser.add_argument('masks')
 get_key_parser.add_argument('key')
 
+encrypt_parser = subparsers.add_parser('analyze')
+encrypt_parser.add_argument('texts')
+encrypt_parser.add_argument('stats')
+
 args = parser.parse_args()
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -36,3 +40,5 @@ if args.goal == 'get_key':
     Controller.get_key(args.text, args.masks, args.key)
 if args.goal == 'decrypt':
     Controller.decrypt(args.source, args.destination, args.key)
+if args.goal == 'analyze':
+    Controller.analyze(args.texts, args.stats)

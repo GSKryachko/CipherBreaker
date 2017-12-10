@@ -3,6 +3,7 @@ import json
 from cipherAnalyzer import CipherAnalyzer
 from encryptor import Encryptor
 from masksBuilder import MasksBuilder
+from textsAnalyzer import TextsAnalyzer
 
 
 class Controller:
@@ -23,11 +24,11 @@ class Controller:
     def get_key(encrypted_text, masks, path_to_key):
         with open(masks, 'r') as f:
             masks = json.loads(f.read())
-        cipher_analyzer = CipherAnalyzer(masks)
+        cipher_analyzer = CipherAnalyzer(masks, 'Stats/')
         with open(encrypted_text, 'r') as encrypted_text:
             text = CipherAnalyzer.prepare_words(
                 encrypted_text.read().replace('\n', ' '))
-            cipher = cipher_analyzer.analyze_cipher_using_range(text)
+            cipher = cipher_analyzer.analyze_using_lists(text)
         with open(path_to_key, 'w') as key_file:
             json.dump(cipher, key_file)
             print("Key saved to ", path_to_key)
@@ -47,3 +48,8 @@ class Controller:
         with open(path_to_key, 'r') as key:
             cipher = json.load(key)
         return Controller.encrypt(encrytpted_text, decrypted_text, cipher)
+
+    @staticmethod
+    def analyze(texts_dir, stats_dir):
+        text_analyzer = TextsAnalyzer(texts_dir, stats_dir)
+        text_analyzer.analyze()

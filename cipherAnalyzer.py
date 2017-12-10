@@ -2,14 +2,24 @@ import re
 from collections import Counter
 
 from masksBuilder import MasksBuilder
+from stats import Stats
 
 
 class CipherAnalyzer:
-    def __init__(self, words_with_masks):
+    def __init__(self, words_with_masks, stats_dir):
         self.words_with_masks = words_with_masks
         self.assumed_cipher = dict()
         self.cipher = dict()
         self.ranged_masks = dict()
+        self.stats = Stats.load(stats_dir)
+    
+    def analyze_using_lists(self, words):
+        for word in words:
+            mask = MasksBuilder.build_mask(word)
+            if mask in self.stats.masks:
+                self.register_chars(self.stats.masks[mask], word)
+        self.try_get_cipher()
+        return self.cipher
     
     def analyze_cipher_using_range(self, words):
         ranged_words = self.range_words(words)
