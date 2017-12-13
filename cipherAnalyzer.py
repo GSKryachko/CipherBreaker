@@ -1,23 +1,40 @@
+import random
 import re
 from collections import Counter
 
+from encryptor import Encryptor
 from masksBuilder import MasksBuilder
 from stats import Stats
+from textsAnalyzer import TextsAnalyzer
 
 
 class CipherAnalyzer:
-    def __init__(self, words_with_masks, stats_dir):
+    def __init__(self, words_with_masks, stats_dir, alphabet):
         self.words_with_masks = words_with_masks
         self.assumed_cipher = dict()
         self.cipher = dict()
         self.ranged_masks = dict()
         self.stats = Stats.load(stats_dir)
+        self.one_letter_guesses = dict()
+        self.two_letter_guesses = dict()
+        self.long_words_guesses = dict()
+        self.popular_words_guesses = dict()
+        self.strange_words_guesses = dict()
+        self.letters_from = {x for x in alphabet}
+        self.letters_to = {x for x in alphabet}
+        self.alphabet = alphabet
     
     def analyze_using_lists(self, words):
         for word in words:
             mask = MasksBuilder.build_mask(word)
             if mask in self.stats.masks:
-                self.register_chars(self.stats.masks[mask], word)
+                if len(mask) == 1:
+                    self.register_chars_to_dict(self.stats.masks, word,
+                                                self.one_letter_guesses)
+                if len(mask) == 2:
+                    self.register_chars_to_dict(self.stats.masks, word,
+                                                self.two_letter_guesses)
+        
         self.try_get_cipher()
         return self.cipher
     
@@ -61,6 +78,15 @@ class CipherAnalyzer:
                     self.assumed_cipher[encrypted_word[i]] = set()
                 self.assumed_cipher[encrypted_word[i]].add(word[i])
     
+    def register_chars_to_dict(self, words, encrypted_word, dictionary):
+        for word in words:
+            for i in range(len(word)):
+                if encrypted_word[i] in self.cipher:
+                    continue
+                if encrypted_word[i] not in dictionary:
+                    dictionary[encrypted_word[i]] = set()
+                dictionary[encrypted_word[i]].add(word[i])
+    
     def try_get_cipher(self):
         for i in self.assumed_cipher:
             if i in self.cipher:
@@ -77,3 +103,37 @@ class CipherAnalyzer:
             if word != '':
                 words.add(word.lower())
         return list(words)
+    
+    @staticmethod
+    def make_random_transposition(cipher):
+        first_letter = random.sample(cipher.keys(), 1)[0]
+        second_letter = random.sample(cipher.keys(), 1)[0]
+        temp = cipher[first_letter]
+        cipher[first_letter] = cipher[second_letter]
+        cipher[second_letter] = temp
+        return cipher
+    
+    def decrypt_using_gradient(self, text_sample):
+        best_cipher = self.cipher
+        max_fitness = 0
+        for i in range(100):
+            cipher = self.make_random_transposition(best_cipher)
+            new_fitness = self.calculate_fitness_function(text_sample, cipher)
+            if new_fitness > max_fitness:
+                max_fitness = new_fitness
+                best_cipher = cipher
+        return best_cipher
+    
+    def calculate_fitness_function(self, text_sample, cipher):
+        decoded = Encryptor.replace(text_sample, cipher)
+        current_frequencies = TextsAnalyzer.get_trigram_frequencies(decoded)
+        natural_frequencies = self.stats.trigrams
+        
+        for i in natural_frequencies.keys() | current_frequencies.keys():
+            if i not in natural_frequencies:
+                natural_frequencies[i] = 0
+            if i not in current_frequencies:
+                current_frequencies[i] = 0
+            natural_frequencies += abs(
+                natural_frequencies[i] - current_frequencies[i])
+        return 0

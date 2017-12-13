@@ -6,40 +6,47 @@ from textsAnalyzer import TextsAnalyzer
 
 class TextsAnalyzerTest(unittest.TestCase):
     def test_register_top_100(self):
-        analyzer = TextsAnalyzer("stub", "stub")
+        analyzer = TextsAnalyzer("stub")
         for word in self.generate_words(1, 201):
             analyzer.register_100_longest(word)
-        actual = analyzer.longest
+        actual = analyzer.temp_longest
         expected = self.generate_words(101, 201)
         self.assertEqual(len(actual), 100)
         self.assertSetEqual(set(actual), set(expected))
     
     def test_contains_letter_for_four_times(self):
-        self.assertTrue(TextsAnalyzer.contains_letter_four_times("degenerate"))
-        self.assertFalse(TextsAnalyzer.contains_letter_four_times("revenge"))
+        self.assertTrue(TextsAnalyzer.has_frequent_letter("degenerate"))
+        self.assertFalse(TextsAnalyzer.has_frequent_letter("revenge"))
+
+    def test_is_meaningless_word(self):
+        self.assertFalse(TextsAnalyzer.is_meaningful_word('boooom'))
+        self.assertTrue(TextsAnalyzer.is_meaningful_word('test'))
     
     def test_register_ngrams(self):
-        analyzer = TextsAnalyzer("stub", "stub")
+        analyzer = TextsAnalyzer("stub")
         analyzer.register_ngrams("python")
-        self.assertEqual(analyzer.letters, ['p', 'y', 't', 'h', 'o', 'n'])
-        self.assertEqual(analyzer.bigrams, ['py', 'yt', 'th', 'ho', 'on'])
-        self.assertEqual(analyzer.trigrams, ['pyt', 'yth', 'tho', 'hon'])
+        self.assertEqual(analyzer.letters,
+                         {'p': 1, 'y': 1, 't': 1, 'h': 1, 'o': 1, 'n': 1})
+        self.assertEqual(analyzer.bigrams,
+                         {'py': 1, 'yt': 1, 'th': 1, 'ho': 1, 'on': 1})
+        self.assertEqual(analyzer.trigrams,
+                         {'pyt': 1, 'yth': 1, 'tho': 1, 'hon': 1})
     
     def test_register_one_letter_word(self):
-        analyzer = TextsAnalyzer("stub", "stub")
+        analyzer = TextsAnalyzer("stub")
         analyzer.register_word('i')
         self.assertTrue('i' in analyzer.letters)
     
     def test_register_two_letter_word(self):
-        analyzer = TextsAnalyzer("stub", "stub")
+        analyzer = TextsAnalyzer("stub", )
         analyzer.register_word('if')
         self.assertTrue('if' in analyzer.two_letter_words)
     
     def test_register_word_with_four_occurrences_of_same_letter(self):
-        analyzer = TextsAnalyzer("stub", "stub")
+        analyzer = TextsAnalyzer("stub", )
         analyzer.register_word('degenerate')
         self.assertTrue(
-            'degenerate' in analyzer.with_multiple_occurrences_of_same_letter)
+            'degenerate' in analyzer.with_frequent_letter)
     
     def test_clean_words(self):
         text = "Probably, it wasn't a good idea?"

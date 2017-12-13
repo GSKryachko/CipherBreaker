@@ -51,5 +51,8 @@ class Controller:
 
     @staticmethod
     def analyze(texts_dir, stats_dir):
-        text_analyzer = TextsAnalyzer(texts_dir, stats_dir)
+        text_analyzer = TextsAnalyzer(texts_dir)
         text_analyzer.analyze()
+        text_analyzer.add_ngrams_to_stats()
+        text_analyzer.add_words_with_masks_to_stats()
+        text_analyzer.stats.save(stats_dir)
