@@ -1,5 +1,4 @@
 import random
-import re
 from collections import Counter
 
 from encryptor import Encryptor
@@ -44,17 +43,13 @@ class CipherAnalyzer:
                     self.stats.with_frequent_letter[mask], word,
                     self.strange_words_guesses)
         self.try_get_cipher()
+        self.fill_cipher()
         return self.cipher
-    
-    def analyze_cipher_using_range(self, words):
-        ranged_words = self.range_words(words)
-        for count in sorted(ranged_words, reverse=True):
-            for word in ranged_words[count]:
-                mask = MasksBuilder.build_mask(word)
-                if mask in self.words_with_masks:
-                    self.register_chars(self.words_with_masks[mask], word)
-                    self.try_get_cipher()
-        return self.cipher
+
+    def fill_cipher(self):
+        for i in self.alphabet:
+            if i not in self.cipher:
+                self.cipher[i] = '_'
     
     def range_masks(self):
         for mask in self.words_with_masks:
@@ -94,14 +89,6 @@ class CipherAnalyzer:
                 if encrypted_word[i] not in dictionary:
                     dictionary[encrypted_word[i]] = set()
                 dictionary[encrypted_word[i]].add(word[i])
-
-    # def try_get_cipher(self):
-    #     for i in self.assumed_cipher:
-    #         if i in self.cipher:
-    #             continue
-    #         if len(self.assumed_cipher[i]) == 1:
-    #             self.cipher[i] = next(iter(self.assumed_cipher[i]))
-    #     self.assumed_cipher.clear()
     
     def try_get_cipher(self):
         self.try_get_cipher_from_dict(self.strange_words_guesses)
@@ -123,15 +110,6 @@ class CipherAnalyzer:
                 self.cipher[i] = next(iter(dictionary[i]))
                 self.letters_from.remove(i)
                 self.letters_to.remove(next(iter(dictionary[i])))
-    
-    @staticmethod
-    def prepare_words(text):
-        words = set()
-        for word in re.sub('[!@#$.,\'?:;`\"()[\]{}\-%*0-9]', '', text).replace(
-                '\n', ' ').split(' '):
-            if word != '':
-                words.add(word.lower())
-        return list(words)
     
     @staticmethod
     def make_random_transposition(cipher):

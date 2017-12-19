@@ -27,8 +27,7 @@ class Controller:
         cipher_analyzer = CipherAnalyzer(masks, 'Stats/',
                                          'abcdefghijklmnopqrstuvwxyz')
         with open(encrypted_text, 'r') as encrypted_text:
-            text = CipherAnalyzer.prepare_words(
-                encrypted_text.read().replace('\n', ' '))
+            text = TextsAnalyzer.clean_words(encrypted_text.read())
             cipher = cipher_analyzer.analyze_using_lists(text)
         with open(path_to_key, 'w') as key_file:
             json.dump(cipher, key_file)

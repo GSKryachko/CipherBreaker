@@ -64,11 +64,6 @@ class CipherAnalyzerTest(unittest.TestCase):
     #     actual = analyzer.analyze_cipher_using_range(text)
     #     self.assertDictEqual(actual, expected)
     #
-    def test_prepare_words(self):
-        text = "I have a pen. I have an apple."
-        expected = ['i', 'have', 'a', 'an', 'pen', 'apple']
-        actual = CipherAnalyzer.prepare_words(text)
-        self.assertSetEqual(set(actual), set(expected))
     
     def test_range_mask(self):
         self.assertEqual(14, CipherAnalyzer.range_mask('bonobo'))

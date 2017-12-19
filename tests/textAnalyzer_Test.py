@@ -57,7 +57,8 @@ class TextsAnalyzerTest(unittest.TestCase):
     def test_get_words_from_file(self):
         expected = ['probably', 'it', 'wasn', 't', 'a', 'good', 'idea']
         actual = [x for x in
-                  TextsAnalyzer.get_words_from_file('textAnalyzerTest.txt')]
+                  TextsAnalyzer.get_words_from_file(
+                      'tests/textAnalyzerTest.txt')]
         self.assertEqual(expected, actual)
     
     @staticmethod
