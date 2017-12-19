@@ -15,7 +15,7 @@ class Controller:
         new_text = []
         with open(source, 'r') as source:
             for line in source:
-                new_text.append(encryptor.replace(line))
+                new_text.append(encryptor.replace(line, chiper))
         with open(dest, 'w+') as destination:
             destination.write('\n'.join(new_text))
             print("Encrypted text was saved to ", dest)
@@ -24,7 +24,8 @@ class Controller:
     def get_key(encrypted_text, masks, path_to_key):
         with open(masks, 'r') as f:
             masks = json.loads(f.read())
-        cipher_analyzer = CipherAnalyzer(masks, 'Stats/')
+        cipher_analyzer = CipherAnalyzer(masks, 'Stats/',
+                                         'abcdefghijklmnopqrstuvwxyz')
         with open(encrypted_text, 'r') as encrypted_text:
             text = CipherAnalyzer.prepare_words(
                 encrypted_text.read().replace('\n', ' '))

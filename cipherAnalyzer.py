@@ -27,14 +27,22 @@ class CipherAnalyzer:
     def analyze_using_lists(self, words):
         for word in words:
             mask = MasksBuilder.build_mask(word)
-            if mask in self.stats.masks:
-                if len(mask) == 1:
-                    self.register_chars_to_dict(self.stats.masks, word,
-                                                self.one_letter_guesses)
-                if len(mask) == 2:
-                    self.register_chars_to_dict(self.stats.masks, word,
-                                                self.two_letter_guesses)
-        
+            if mask in self.stats.single_letter_words:
+                self.register_chars_to_dict(
+                    self.stats.single_letter_words[mask], word,
+                    self.one_letter_guesses)
+            if mask in self.stats.two_letter_words:
+                self.register_chars_to_dict(
+                    self.stats.two_letter_words[mask], word,
+                    self.two_letter_guesses)
+            if mask in self.stats.longest:
+                self.register_chars_to_dict(
+                    self.stats.longest[mask], word,
+                    self.long_words_guesses)
+            if mask in self.stats.with_frequent_letter:
+                self.register_chars_to_dict(
+                    self.stats.with_frequent_letter[mask], word,
+                    self.strange_words_guesses)
         self.try_get_cipher()
         return self.cipher
     
@@ -86,19 +94,40 @@ class CipherAnalyzer:
                 if encrypted_word[i] not in dictionary:
                     dictionary[encrypted_word[i]] = set()
                 dictionary[encrypted_word[i]].add(word[i])
+
+    # def try_get_cipher(self):
+    #     for i in self.assumed_cipher:
+    #         if i in self.cipher:
+    #             continue
+    #         if len(self.assumed_cipher[i]) == 1:
+    #             self.cipher[i] = next(iter(self.assumed_cipher[i]))
+    #     self.assumed_cipher.clear()
     
     def try_get_cipher(self):
-        for i in self.assumed_cipher:
-            if i in self.cipher:
+        self.try_get_cipher_from_dict(self.strange_words_guesses)
+        self.try_get_cipher_from_dict(self.long_words_guesses)
+        self.try_get_cipher_from_dict(self.two_letter_guesses)
+        self.try_get_cipher_from_dict(self.one_letter_guesses)
+
+    def try_get_cipher_from_dict(self, dictionary):
+        for i in dictionary:
+            if i not in self.letters_from:
                 continue
-            if len(self.assumed_cipher[i]) == 1:
-                self.cipher[i] = next(iter(self.assumed_cipher[i]))
-        self.assumed_cipher.clear()
+            dictionary[i] = {x for x in dictionary[i] if
+                             x in self.letters_to}
+            if len(dictionary[i]) == 0:
+                continue
+            if len(dictionary[i]) == 1:
+                if next(iter(dictionary[i])) not in self.letters_to:
+                    continue
+                self.cipher[i] = next(iter(dictionary[i]))
+                self.letters_from.remove(i)
+                self.letters_to.remove(next(iter(dictionary[i])))
     
     @staticmethod
     def prepare_words(text):
         words = set()
-        for word in re.sub('[!@#$.,\'?:;`\"()[\]{}\-%*1-9]', '', text).replace(
+        for word in re.sub('[!@#$.,\'?:;`\"()[\]{}\-%*0-9]', '', text).replace(
                 '\n', ' ').split(' '):
             if word != '':
                 words.add(word.lower())
@@ -128,12 +157,12 @@ class CipherAnalyzer:
         decoded = Encryptor.replace(text_sample, cipher)
         current_frequencies = TextsAnalyzer.get_trigram_frequencies(decoded)
         natural_frequencies = self.stats.trigrams
-        
+        fitness = 0
         for i in natural_frequencies.keys() | current_frequencies.keys():
             if i not in natural_frequencies:
                 natural_frequencies[i] = 0
             if i not in current_frequencies:
                 current_frequencies[i] = 0
-            natural_frequencies += abs(
+            fitness += abs(
                 natural_frequencies[i] - current_frequencies[i])
-        return 0
+        return fitness

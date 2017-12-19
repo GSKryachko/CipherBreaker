@@ -42,18 +42,17 @@ class Stats:
             with open(stats_dir + "single_letter_words.txt",
                       'r') as f:
                 print(f.name)
-                stats.single_letter_words = set(json.loads(f.read()))
+                stats.single_letter_words = json.loads(f.read())
             with open(stats_dir + "two_letter_words.txt", 'r') as f:
-                stats.two_letter_words = set(json.loads(f.read()))
+                stats.two_letter_words = json.loads(f.read())
             with open(stats_dir + "with_repeating_letter.txt", 'r') as f:
-                stats.with_frequent_letter = set(
-                    json.loads(f.read()))
+                stats.with_frequent_letter = json.loads(f.read())
             with open(stats_dir + "longest.txt", 'r') as f:
-                stats.longest = set(json.loads(f.read()))
+                stats.longest = json.loads(f.read())
             with open(stats_dir + "letters.txt", 'r') as f:
-                stats.letters = json.loads(f.read())
+                stats.letters = sorted(json.loads(f.read()))
             with open(stats_dir + "bigrams.txt", 'r') as f:
-                stats.bigrams = json.loads(f.read())
+                stats.bigrams = sorted(json.loads(f.read()))
             with open(stats_dir + "trigrams.txt", 'r') as f:
                 stats.trigrams = sorted(json.loads(f.read()))
             with open(stats_dir + "top1000.txt", 'r') as f:
