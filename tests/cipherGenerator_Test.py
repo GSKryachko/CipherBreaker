@@ -1,6 +1,6 @@
 import unittest
 
-from cipherGenerator import CipherGenerator
+from Modules.cipherGenerator import CipherGenerator
 
 
 class CipherGeneratorTest(unittest.TestCase):

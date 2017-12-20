@@ -1,6 +1,6 @@
 import unittest
 
-from encryptor import Encryptor
+from Modules.encryptor import Encryptor
 
 
 class MaskBuilderTest(unittest.TestCase):

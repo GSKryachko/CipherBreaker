@@ -1,7 +1,7 @@
 import unittest
 from random import shuffle
 
-from textsAnalyzer import TextsAnalyzer
+from Modules.textsAnalyzer import TextsAnalyzer
 
 
 class TextsAnalyzerTest(unittest.TestCase):

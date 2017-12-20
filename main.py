@@ -1,6 +1,6 @@
 import argparse
 
-from cipherGenerator import CipherGenerator
+from Modules.cipherGenerator import CipherGenerator
 from controller import Controller
 
 parser = argparse.ArgumentParser()

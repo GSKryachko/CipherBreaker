@@ -1,10 +1,7 @@
 import random
-from collections import Counter
 
-from encryptor import Encryptor
-from masksBuilder import MasksBuilder
-from stats import Stats
-from textsAnalyzer import TextsAnalyzer
+from Modules.masksBuilder import MasksBuilder
+from Modules.stats import Stats
 
 
 class CipherAnalyzer:
@@ -19,13 +16,13 @@ class CipherAnalyzer:
         self.long_words_guesses = dict()
         self.popular_words_guesses = dict()
         self.strange_words_guesses = dict()
-        self.letters_from = {x for x in alphabet}
-        self.letters_to = {x for x in alphabet}
+        self.letters_from = {x for x in alphabet.value}
+        self.letters_to = {x for x in alphabet.value}
         self.alphabet = alphabet
     
     def analyze_using_lists(self, words):
         for word in words:
-            mask = MasksBuilder.build_mask(word)
+            mask = MasksBuilder.build_mask(word, self.alphabet)
             if mask in self.stats.single_letter_words:
                 self.register_chars_to_dict(
                     self.stats.single_letter_words[mask], word,
@@ -47,39 +44,9 @@ class CipherAnalyzer:
         return self.cipher
 
     def fill_cipher(self):
-        for i in self.alphabet:
+        for i in self.alphabet.value:
             if i not in self.cipher:
                 self.cipher[i] = '_'
-    
-    def range_masks(self):
-        for mask in self.words_with_masks:
-            mask_frequency_index = CipherAnalyzer.range_mask(mask)
-            if mask_frequency_index not in self.ranged_masks:
-                self.ranged_masks[mask_frequency_index] = set()
-            self.ranged_masks[mask_frequency_index].add(mask)
-    
-    @staticmethod
-    def range_mask(mask):
-        counter = Counter(mask)
-        return sum([x ** 2 for x in counter.values()])
-    
-    def range_words(self, words):
-        words_with_mask = dict()
-        for word in words:
-            mask_frequency_index = CipherAnalyzer.range_mask(word)
-            if mask_frequency_index not in words_with_mask:
-                words_with_mask[mask_frequency_index] = set()
-            words_with_mask[mask_frequency_index].add(word)
-        return words_with_mask
-    
-    def register_chars(self, words, encrypted_word):
-        for word in words:
-            for i in range(len(word)):
-                if encrypted_word[i] in self.cipher:
-                    continue
-                if encrypted_word[i] not in self.assumed_cipher:
-                    self.assumed_cipher[encrypted_word[i]] = set()
-                self.assumed_cipher[encrypted_word[i]].add(word[i])
     
     def register_chars_to_dict(self, words, encrypted_word, dictionary):
         for word in words:
@@ -119,28 +86,3 @@ class CipherAnalyzer:
         cipher[first_letter] = cipher[second_letter]
         cipher[second_letter] = temp
         return cipher
-    
-    def decrypt_using_gradient(self, text_sample):
-        best_cipher = self.cipher
-        max_fitness = 0
-        for i in range(100):
-            cipher = self.make_random_transposition(best_cipher)
-            new_fitness = self.calculate_fitness_function(text_sample, cipher)
-            if new_fitness > max_fitness:
-                max_fitness = new_fitness
-                best_cipher = cipher
-        return best_cipher
-    
-    def calculate_fitness_function(self, text_sample, cipher):
-        decoded = Encryptor.replace(text_sample, cipher)
-        current_frequencies = TextsAnalyzer.get_trigram_frequencies(decoded)
-        natural_frequencies = self.stats.trigrams
-        fitness = 0
-        for i in natural_frequencies.keys() | current_frequencies.keys():
-            if i not in natural_frequencies:
-                natural_frequencies[i] = 0
-            if i not in current_frequencies:
-                current_frequencies[i] = 0
-            fitness += abs(
-                natural_frequencies[i] - current_frequencies[i])
-        return fitness

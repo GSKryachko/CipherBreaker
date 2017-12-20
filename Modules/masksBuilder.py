@@ -1,14 +1,9 @@
-import re
-
-
 class MasksBuilder:
-    alphabet = "abcdefghijklmnopqrstuvwxyz"
-    
     @staticmethod
-    def build_masks(words):
+    def build_masks(words, alphabet):
         masks = dict()
         for word in words:
-            mask = MasksBuilder.build_mask(word)
+            mask = MasksBuilder.build_mask(word, alphabet)
             if mask not in masks:
                 masks[mask] = [word]
             else:
@@ -16,18 +11,13 @@ class MasksBuilder:
         return masks
     
     @staticmethod
-    def build_mask(word):
+    def build_mask(word, alphabet):
         substitution = dict()
         pointer = 0
         mask = ""
         for i in word:
             if i not in substitution:
-                substitution[i] = MasksBuilder.alphabet[pointer]
+                substitution[i] = alphabet.value[pointer]
                 pointer += 1
             mask += substitution[i]
         return mask
-
-    @staticmethod
-    def prepare_words(text):
-        return [word.lower() for word in
-                re.sub('[!@#$.,\'?:;`-]', '', text).split(' ')]

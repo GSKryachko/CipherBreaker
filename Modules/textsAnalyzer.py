@@ -1,16 +1,14 @@
-import os
-import re
 from collections import Counter, defaultdict
 
-from masksBuilder import MasksBuilder
-from stats import Stats
+from Modules.masksBuilder import MasksBuilder
+from Modules.stats import Stats
+from Modules.textCleaner import TextCleaner
 
 
 class TextsAnalyzer:
     shortest_longest_word_length = 0
 
-    def __init__(self, texts_dir):
-        self.texts_dir = texts_dir
+    def __init__(self, alphabet):
         self.letters = defaultdict(int)
         self.bigrams = defaultdict(int)
         self.trigrams = defaultdict(int)
@@ -19,35 +17,16 @@ class TextsAnalyzer:
         self.two_letter_words = set()
         self.single_letter_words = set()
         self.with_frequent_letter = set()
-    
-    def analyze(self):
-        for text in os.listdir(self.texts_dir):
-            for word in self.get_words_from_file(self.texts_dir + text):
-                self.register_word(word)
-    
-    @staticmethod
-    def get_words_from_file(filename):
-        with open(filename, 'r') as f:
-            for line in f:
-                for word in TextsAnalyzer.clean_words(line):
-                    yield word
-    
-    @staticmethod
-    def clean_words(text):
-        text = re.sub('[^a-z^A-Z]', ' ', text)
-        for word in text.split(' '):
-            word = word.lower()
-            if TextsAnalyzer.is_meaningful_word(word):
-                yield word
-    
-    @staticmethod
-    def is_meaningful_word(word):
-        if word == '':
-            return False
-        if re.match('.*([a-zA-Z])\\1{3,}.*', word):
-            return False
-        return True
+        self.alphabet = alphabet
 
+    def analyze(self, words):
+        for word in words:
+            if not TextCleaner.is_meaningful_word(word, self.alphabet):
+                continue
+            self.register_word(word)
+        self.add_ngrams_to_stats()
+        self.add_words_with_masks_to_stats()
+    
     @staticmethod
     def has_frequent_letter(word):
         return max(Counter(word).values()) > 3
@@ -93,14 +72,15 @@ class TextsAnalyzer:
 
     def add_words_with_masks_to_stats(self):
         self.stats.single_letter_words = MasksBuilder.build_masks(
-            self.single_letter_words)
+            self.single_letter_words, self.alphabet)
         self.stats.two_letter_words = MasksBuilder.build_masks(
-            self.two_letter_words)
-        self.stats.longest = MasksBuilder.build_masks(self.temp_longest)
+            self.two_letter_words, self.alphabet)
+        self.stats.longest = MasksBuilder.build_masks(self.temp_longest,
+                                                      self.alphabet)
         self.stats.with_frequent_letter = \
             MasksBuilder.build_masks(
-                self.with_frequent_letter)
-
+                self.with_frequent_letter, self.alphabet)
+    
     def add_ngrams_to_stats(self):
         self.stats.letters = TextsAnalyzer.get_normalized_dictionary(
             self.letters)
