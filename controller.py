@@ -1,6 +1,5 @@
 import json
 
-from Modules.alphabets import Alphabet
 from Modules.cipherAnalyzer import CipherAnalyzer
 from Modules.encryptor import Encryptor
 from Modules.filesReader import FilesReader
@@ -26,10 +25,10 @@ class Controller:
         with open(masks, 'r') as f:
             masks = json.loads(f.read())
         cipher_analyzer = CipherAnalyzer(masks, path_to_stats,
-                                         alphabet.value)
+                                         alphabet)
         with open(encrypted_text, 'r') as encrypted_text:
-            text = TextCleaner.clean_text(encrypted_text.read(),
-                                          alphabet.value)
+            text = TextCleaner.clean_text(encrypted_text.read().split(' '),
+                                          alphabet)
             cipher = cipher_analyzer.analyze_using_lists(text)
         with open(path_to_key, 'w') as key_file:
             json.dump(cipher, key_file)
@@ -37,11 +36,10 @@ class Controller:
     
     @staticmethod
     def build_masks(vocabulary, path_to_masks, alphabet):
-        
         with open(vocabulary, 'r') as source:
             text = TextCleaner.clean_text(source.read(), alphabet.value)
-            masks = MasksBuilder.build_masks(text)
-
+            masks = MasksBuilder.build_masks(text, alphabet)
+        
         with open(path_to_masks, 'w+') as destination:
             json.dump(masks, destination)
             print("Masks saved to", path_to_masks)
@@ -53,8 +51,7 @@ class Controller:
         return Controller.encrypt(encrytpted_text, decrypted_text, cipher)
 
     @staticmethod
-    def analyze(texts_dir, stat_dir):
-        alphabet = Alphabet.EN
+    def analyze(texts_dir, stat_dir, alphabet):
         text = FilesReader.get_words(texts_dir)
         clean_text = TextCleaner.clean_text(text, alphabet)
         text_analyzer = TextsAnalyzer(alphabet)

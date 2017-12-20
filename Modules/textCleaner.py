@@ -5,7 +5,6 @@ class TextCleaner:
     @staticmethod
     def clean_text(text, alphabet):
         pattern = '[^' + alphabet.value + '^' + alphabet.value.upper() + ']'
-        # text = re.sub(pattern, ' ', text)
         for phrase in text:
             for word in re.sub(pattern, ' ', phrase).split(' '):
                 word = word.lower()

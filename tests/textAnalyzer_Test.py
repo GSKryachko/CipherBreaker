@@ -17,10 +17,6 @@ class TextsAnalyzerTest(unittest.TestCase):
     def test_contains_letter_for_four_times(self):
         self.assertTrue(TextsAnalyzer.has_frequent_letter("degenerate"))
         self.assertFalse(TextsAnalyzer.has_frequent_letter("revenge"))
-
-    def test_is_meaningless_word(self):
-        self.assertFalse(TextsAnalyzer.is_meaningful_word('boooom'))
-        self.assertTrue(TextsAnalyzer.is_meaningful_word('test'))
     
     def test_register_ngrams(self):
         analyzer = TextsAnalyzer("stub")
@@ -47,19 +43,6 @@ class TextsAnalyzerTest(unittest.TestCase):
         analyzer.register_word('degenerate')
         self.assertTrue(
             'degenerate' in analyzer.with_frequent_letter)
-    
-    def test_clean_words(self):
-        text = "Probably, it wasn't a good idea?"
-        expected = ['probably', 'it', 'wasn', 't', 'a', 'good', 'idea']
-        actual = [x for x in TextsAnalyzer.clean_words(text)]
-        self.assertEqual(expected, actual)
-    
-    def test_get_words_from_file(self):
-        expected = ['probably', 'it', 'wasn', 't', 'a', 'good', 'idea']
-        actual = [x for x in
-                  TextsAnalyzer.get_words_from_file(
-                      'tests/textAnalyzerTest.txt')]
-        self.assertEqual(expected, actual)
     
     @staticmethod
     def generate_words(shortest, longest):
