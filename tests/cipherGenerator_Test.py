@@ -13,4 +13,3 @@ class CipherGeneratorTest(unittest.TestCase):
             self.assertTrue(i in cipher.keys())
             self.assertTrue(i in cipher.values())
             self.assertTrue(cipher[i] in alphabet)
-            

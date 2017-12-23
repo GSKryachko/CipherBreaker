@@ -16,6 +16,4 @@ class TextCleaner:
         if word == '':
             return False
         pattern = r'.*([' + alphabet.value + alphabet.value.upper() + r'])\1{3,}.*'
-        if re.match(pattern, word):
-            return False
-        return True
+        return not re.match(pattern, word)

@@ -34,7 +34,7 @@ class TextsAnalyzer:
     @staticmethod
     def get_normalized_dictionary(dictionary):
         values_sum = sum(dictionary.values())
-        normalized = dict()
+        normalized = {}
         for key in dictionary:
             normalized[key] = dictionary[key] / values_sum
         return normalized
@@ -63,7 +63,7 @@ class TextsAnalyzer:
         self.register_100_longest(word)
     
     def register_ngrams(self, word):
-        for i in range(0, len(word)):
+        for i in range(len(word)):
             self.letters[word[i]] += 1
             if i < len(word) - 1:
                 self.bigrams[word[i:i + 2]] += 1

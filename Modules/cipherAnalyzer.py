@@ -7,15 +7,15 @@ from Modules.stats import Stats
 class CipherAnalyzer:
     def __init__(self, words_with_masks, stats_dir, alphabet):
         self.words_with_masks = words_with_masks
-        self.assumed_cipher = dict()
-        self.cipher = dict()
-        self.ranged_masks = dict()
+        self.assumed_cipher = {}
+        self.cipher = {}
+        self.ranged_masks = {}
         self.stats = Stats.load(stats_dir)
-        self.one_letter_guesses = dict()
-        self.two_letter_guesses = dict()
-        self.long_words_guesses = dict()
-        self.popular_words_guesses = dict()
-        self.strange_words_guesses = dict()
+        self.one_letter_guesses = {}
+        self.two_letter_guesses = {}
+        self.long_words_guesses = {}
+        self.popular_words_guesses = {}
+        self.strange_words_guesses = {}
         self.letters_from = {x for x in alphabet.value}
         self.letters_to = {x for x in alphabet.value}
         self.alphabet = alphabet
